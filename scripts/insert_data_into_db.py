@@ -45,6 +45,7 @@ async def main():
         ("./data/olist_geolocation_dataset.csv", "geolocation"),
         ("./data/olist_order_items_dataset.csv", "order_items"),
         ("./data/olist_order_reviews_dataset.csv", "order_reviews"),
+        ("./data/olist_order_payments_dataset.csv", "order_payments"),
         ("./data/olist_sellers_dataset.csv", "sellers"),
     ]
 
