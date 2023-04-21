@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS analytics.fs_payment;
+CREATE TABLE analytics.fs_payment AS
 WITH
 tb_order AS (
     SELECT DISTINCT t1.order_id, t2.seller_id
@@ -46,19 +48,19 @@ tb_summary AS (
         sum(
             CASE WHEN payment_type = 'debit_card'
             THEN order_qty_payment_type ELSE 0 END
-        ) / sum(order_qty_payment_type) AS prop_debit_card_orders,
+        ) / sum(order_qty_payment_type) AS pct_debit_card_orders,
         sum(
             CASE WHEN payment_type = 'credit_card'
             THEN order_qty_payment_type ELSE 0 END
-        ) / sum(order_qty_payment_type) AS prop_credit_card_orders,
+        ) / sum(order_qty_payment_type) AS pct_credit_card_orders,
         sum(
             CASE WHEN payment_type = 'voucher'
             THEN order_qty_payment_type ELSE 0 END
-        ) / sum(order_qty_payment_type) AS prop_voucher_orders,
+        ) / sum(order_qty_payment_type) AS pct_voucher_orders,
         sum(
             CASE WHEN payment_type = 'boleto'
             THEN order_qty_payment_type ELSE 0 END
-        ) / sum(order_qty_payment_type) AS prop_boleto_orders,
+        ) / sum(order_qty_payment_type) AS pct_boleto_orders,
         -- total value per payment type
         sum(
             CASE WHEN payment_type = 'debit_card'
@@ -76,23 +78,19 @@ tb_summary AS (
         sum(
             CASE WHEN payment_type = 'boleto'
             THEN order_value_payment_type ELSE 0 END
-        ) / sum(order_value_payment_type) AS pct_boleto_orders,
+        ) / sum(order_value_payment_type) AS pct_boleto_value,
         sum(
             CASE WHEN payment_type = 'debit_card'
             THEN order_value_payment_type ELSE 0 END
-        ) / sum(order_value_payment_type) AS pct_debit_card_orders,
+        ) / sum(order_value_payment_type) AS pct_debit_card_value,
         sum(
             CASE WHEN payment_type = 'credit_card'
             THEN order_value_payment_type ELSE 0 END
-        ) / sum(order_value_payment_type) AS pct_credit_card_orders,
+        ) / sum(order_value_payment_type) AS pct_credit_card_value,
         sum(
             CASE WHEN payment_type = 'voucher'
             THEN order_value_payment_type ELSE 0 END
-        ) / sum(order_value_payment_type) AS pct_voucher_orders,
-        sum(
-            CASE WHEN payment_type = 'boleto'
-            THEN order_value_payment_type ELSE 0 END
-        ) / sum(order_value_payment_type) AS pct_boleto_orders
+        ) / sum(order_value_payment_type) AS pct_voucher_value
     FROM tb_group
     GROUP BY seller_id
 ),

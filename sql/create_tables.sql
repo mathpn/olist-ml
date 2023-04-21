@@ -71,3 +71,4 @@ CREATE TABLE IF NOT EXISTS sellers (
     desc_state text,
     PRIMARY KEY (seller_id)
 );
+CREATE SCHEMA analytics;
