@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS analytics.fs_delivery;
-CREATE TABLE analytics.fs_delivery AS
 WITH tb_order AS (
     SELECT DISTINCT
         t1.order_id,
@@ -14,8 +12,8 @@ WITH tb_order AS (
     FROM orders AS t1
     LEFT JOIN order_items AS t2
     ON t1.order_id = t2.order_id
-    WHERE purchase_timestamp < '2018-01-01'
-    AND purchase_timestamp >= date('2018-01-01') - interval '6 months'
+    WHERE purchase_timestamp < '{date}'
+    AND purchase_timestamp >= date('{date}') - interval '6 months'
     AND seller_id IS NOT NULL
     GROUP BY
         t1.order_id,
@@ -30,7 +28,7 @@ tb_summary AS (
     SELECT
         seller_id,
         COUNT(
-            DISTINCT CASE WHEN coalesce(DATE(delivery_date), '2018-01-01')
+            DISTINCT CASE WHEN coalesce(DATE(delivery_date), '{date}')
             > DATE(estimated_delivery_date)
             THEN order_id END
         )::decimal / NULLIF(
@@ -61,6 +59,7 @@ tb_summary AS (
     GROUP BY seller_id
 )
 SELECT
-    date('2018-01-01') AS date_reference,
+    date('{date}') AS date_reference,
+    NOW() AS date_ingestion,
     *
 FROM tb_summary;

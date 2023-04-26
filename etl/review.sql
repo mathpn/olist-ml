@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS analytics.fs_review;
-CREATE TABLE analytics.fs_review AS
 WITH tb_order AS (
     SELECT DISTINCT
         t1.order_id,
@@ -7,8 +5,8 @@ WITH tb_order AS (
     FROM orders AS t1
     LEFT JOIN order_items AS t2
     ON t1.order_id = t2.order_id
-    WHERE purchase_timestamp < '2018-01-01'
-    AND purchase_timestamp >= date('2018-01-01') - interval '6 months'
+    WHERE purchase_timestamp < '{date}'
+    AND purchase_timestamp >= date('{date}') - interval '6 months'
     AND seller_id IS NOT NULL
 ),
 tb_join AS (
@@ -33,6 +31,7 @@ tb_summary AS (
     GROUP BY seller_id
 )
 SELECT
-    date('2018-01-01') as date_reference,
+    date('{date}') as date_reference,
+    NOW() AS date_ingestion,
     *
 FROM tb_summary;
