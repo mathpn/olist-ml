@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS analytics.fs_client;
-CREATE TABLE analytics.fs_client AS
 WITH tb_join AS (
     SELECT DISTINCT
         t1.order_id,
@@ -12,8 +10,8 @@ WITH tb_join AS (
     LEFT JOIN customers AS t3
     ON t1.customer_id = t3.customer_id
 
-    WHERE purchase_timestamp < '2018-01-01'
-    AND purchase_timestamp >= date('2018-01-01') - interval '6 months'
+    WHERE purchase_timestamp < '{date}'
+    AND purchase_timestamp >= date('{date}') - interval '6 months'
     AND seller_id IS NOT NULL
 ),
 tb_group AS (
@@ -50,6 +48,7 @@ tb_group AS (
     FROM tb_join GROUP BY seller_id
 )
 SELECT
-    date('2018-01-01') AS date_reference,
+    date('{date}') AS date_reference,
+    NOW() AS date_ingestion,
     *
     FROM tb_group;

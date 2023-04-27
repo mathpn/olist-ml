@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS analytics.fs_sale;
-CREATE TABLE analytics.fs_sale AS
 WITH tb_join AS (
     SELECT
         t2.*,
@@ -7,8 +5,8 @@ WITH tb_join AS (
     FROM orders AS t1
     LEFT JOIN order_items AS t2
     ON t1.order_id = t2.order_id
-    WHERE purchase_timestamp < '2018-01-01'
-    AND purchase_timestamp >= date('2018-01-01') - interval '6 months'
+    WHERE purchase_timestamp < '{date}'
+    AND purchase_timestamp >= date('{date}') - interval '6 months'
     AND seller_id IS NOT NULL
 ),
 tb_summary AS (
@@ -19,7 +17,7 @@ tb_summary AS (
         COUNT(product_id) AS qty_items,
         date_part(
             'day',
-            '2018-01-01'::timestamp - max(purchase_timestamp::timestamp)
+            '{date}'::timestamp - max(purchase_timestamp::timestamp)
         ) AS qty_recency,
         sum(price) / COUNT(DISTINCT order_id) AS avg_ticket,
         avg(price) AS avg_price,
@@ -52,13 +50,13 @@ tb_customer_life AS (
         max(
             date_part(
                 'day',
-                '2018-01-01'::timestamp - t1.purchase_timestamp::timestamp
+                '{date}'::timestamp - t1.purchase_timestamp::timestamp
             )
         ) AS qty_base_days
     FROM orders AS t1
     LEFT JOIN order_items AS t2
     ON t1.order_id = t2.order_id
-    WHERE purchase_timestamp < '2018-01-01'
+    WHERE purchase_timestamp < '{date}'
     AND t2.seller_id IS NOT NULL
     GROUP BY t2.seller_id
 ),
@@ -87,7 +85,8 @@ tb_interval AS (
     GROUP BY seller_id
 )
 SELECT
-    date('2018-01-01') AS date_reference,
+    date('{date}') AS date_reference,
+    NOW() AS date_ingestion,
     t1.*,
     t2.max_order_price,
     t2.min_order_price,
