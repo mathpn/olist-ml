@@ -8,6 +8,5 @@ docker run --name postgres_olist -e POSTGRES_PASSWORD=postgres \
     -v ./postgres-data:/var/lib/postgresql/data \
     -d postgres
 sleep 5
-psql "postgresql://postgres:postgres@localhost:5401/olist" -a -f sql/create_tables.sql
 
 python scripts/insert_data_into_db.py

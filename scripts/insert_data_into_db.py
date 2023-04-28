@@ -49,6 +49,11 @@ async def main():
         ("./data/olist_sellers_dataset.csv", "sellers"),
     ]
 
+    with open("sql/create_tables.sql", "r") as create_f:
+        create_query = create_f.read()
+
+    await pool.execute(create_query)
+
     for csv_file, table in csv_tables:
         print(f"inserting {table}")
         df = pd.read_csv(csv_file)
