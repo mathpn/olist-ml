@@ -137,3 +137,6 @@ data/
 # data
 *.db
 *.zip
+
+# mlflow
+mlruns/
