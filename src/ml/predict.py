@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 
 import mlflow
 import mlflow.sklearn
@@ -35,15 +36,19 @@ def insert_from_query(cursor, query, table_name) -> None:
 
 
 def main():
-    model = mlflow.sklearn.load_model("models:/olist_churn_model/10")
+    with open("src/env.json", "r") as env_file:
+        env = json.load(env_file)
+    mlflow.set_tracking_uri(env["mlflow_tracking_uri"])
+
+    model = mlflow.sklearn.load_model("models:/olist_churn_model/1")
     conn = create_engine(POSTGRES_URI)
     pg_conn = psycopg2.connect(POSTGRES_URI)
 
-    with open("etl/fs_join.sql", "r") as fs_join_file:
+    with open("src/etl/fs_join.sql", "r") as fs_join_file:
         fs_join_query = fs_join_file.read()
 
     print("-> updating fs_join table")
-    pg_conn.execute(fs_join_query)
+    pg_conn.cursor().execute(fs_join_query)
 
     df = pd.read_sql("SELECT * FROM analytics.abt_olist_churn", conn)
     print(f"-> predicting {len(df)} samples")
@@ -60,11 +65,11 @@ def main():
     cursor = pg_conn.cursor()
     if not table_exists(cursor, "analytics", "olist_models"):
         print("-> creating prediction table")
-        df_extract.to_sql("olist_models", conn, schema="analytics", if_exists="append")
+        df_extract.to_sql("olist_models", conn, schema="analytics", if_exists="append", index=False)
     else:
         print("-> updating prediction table")
         delete_date(cursor, "analytics.olist_models", dt_now)
-        df_extract.to_sql("olist_models", conn, schema="analytics", if_exists="append")
+        df_extract.to_sql("olist_models", conn, schema="analytics", if_exists="append", index=False)
 
     pg_conn.commit()
 
