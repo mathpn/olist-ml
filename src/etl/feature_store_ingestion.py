@@ -77,7 +77,7 @@ async def main():
     print(f"-> ingesting to table {table_name}")
 
     conn = await asyncpg.connect(POSTGRES_URI)
-    query = import_query(f"etl/{args.table}.sql")
+    query = import_query(f"src/etl/{args.table}.sql")
 
     dt_start = datetime.strptime(args.dt_start, "%Y-%m-%d")
     dt_stop = datetime.strptime(args.dt_stop, "%Y-%m-%d")
